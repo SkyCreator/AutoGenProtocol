@@ -1,0 +1,93 @@
+#ifndef __{{.ClassName}}_H__
+#define __{{.ClassName}}_H__
+
+#include "Type.h"
+#include "PacketFactoryBaseWithDestoryPacket.h"
+namespace Packets
+{
+    class {{.ClassName}} : public Packet
+    {
+    public:
+        {{.ClassName}}(){CleanUp();}
+        virtual ~{{.ClassName}}(){};
+        VOID CleanUp(){};
+
+    //公共继承接口
+    virtual BOOL Read(SocketInputStream& iStream);
+    virtual BOOL Write(SocketOutputStream& oStream) const;
+    virtual UINT Execute(Player* pPlayer);
+    virtual PacketID_t GetPacketID() const { return {{.ProtocolName}}; }
+    virtual UINT GetPacketSize() const 
+    { 
+        UINT totalSize = 0;{{range .DataVar}}{{if .VarIsArray}}
+        totalSize += sizeof({{.VarType}}) * {{.VarValue}}Count;{{else}}
+        totalSize += sizeof({{.VarType}});{{end}}{{end}}
+        return totalSize;
+    }
+    
+    public:{{range .DataVar}}{{if .VarIsArray}} {{if .VarIsChar}}
+            VOID Set{{.VarValue}}( const {{.VarType}}* v)
+            {
+                if (NULL == v) {return;}
+                INT len = sizeof({{.VarValue}}) - 1;
+                {{.VarValue}}[len] = '\0';
+                strncpy( {{.VarValue}}, v, len );
+                {{.VarValue}}Count = strlen({{.VarValue}});
+            }
+            const {{.VarType}}* Get{{.VarValue}}(VOID) 
+            { 
+                return {{.VarValue}}; 
+            } {{else if .VarIsBaseType}}
+            VOID Set{{.VarValue}}( int i, {{.VarType}} v)
+            {
+                {{.VarValue}}[i] = v;
+            }
+            {{.VarType}} Get{{.VarValue}}(int i) const 
+            { 
+                return {{.VarValue}}[i]; 
+            }{{else}}
+            {{.VarType}}* Get{{.VarValue}}(int i)
+            {
+                return {{.VarValue}} + i;
+            }{{end}}{{else}}{{if .VarIsBaseType}}
+            VOID Set{{.VarValue}}( {{.VarType}} v)
+            {
+                {{.VarValue}} = v;
+            }
+            {{.VarType}} Get{{.VarValue}}(VOID) const 
+            { 
+                return {{.VarValue}}; 
+            }{{else}}
+            {{.VarType}}* Get{{.VarValue}}()
+            {
+                return &{{.VarValue}};
+            }{{end}}{{end}}{{end}}
+    private:{{range .DataVar}}{{if .VarIsArray}}
+            {{.VarType}} {{.VarValue}}[{{.VarCount}}];{{else}}
+            {{.VarType}} {{.VarValue}};{{end}}{{end}}
+    };
+
+    class {{.ClassName}}Factory : public PacketFactoryBaseWithDestoryPacket
+    {
+    public:
+        Packet* CreatePacket() { return new {{.ClassName}}();}
+        PacketID_t GetPacketID() const { return {{.ProtocolName}}; }
+        UINT GetPacketMaxSize() const 
+        {
+            UINT totalSize = 0;{{range .DataVar}}{{if .VarIsArray}}
+            totalSize += sizeof({{.VarType}})* {{.VarCount}};{{else}}
+            totalSize += sizeof({{.VarType}});{{end}}{{end}}
+            return totalSize;
+        }
+    };
+
+    class {{.ClassName}}Handler
+    {
+    public:
+        static UINT Execute( {{.ClassName}}* pPacket, Player* pPlayer );
+    };
+}
+
+using namespace Packets;
+
+#endif

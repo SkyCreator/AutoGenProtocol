@@ -1,0 +1,7 @@
+class GWTest
+protocol PACKET_GW_TEST
+INT Value1
+UINT Value2[5]
+SHORT Value3
+BYTE Value4
+CHAR Value5[10]

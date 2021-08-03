@@ -1,0 +1,31 @@
+#include "{{.ClassName}}.h"
+
+BOOL {{.ClassName}}::Read( SocketInputStream& iStream )
+{
+__ENTER_FUNCTION{{range .DataVar}}{{if .VarIsArray}}
+    iStream.GetArray({{.VarValue}}, {{.VarValue}}Count);{{else if .VarIsSpecialType}}
+    {{.VarValue}}.Read(iStream);{{else}}
+    iStream.Read({{.VarValue}}, sizeof({{.VarType}}));{{end}}{{end}}
+    return TRUE;
+__LEAVE_FUNCTION
+    return FALSE;
+}
+
+BOOL {{.ClassName}}::Write( SocketOutputStream& oStream ) const
+{
+__ENTER_FUNCTION{{range .DataVar}}{{if .VarIsArray}}
+    oStream.PutArray({{.VarValue}}, {{.VarValue}}Count);{{else if .VarIsSpecialType}}
+    {{.VarValue}}.Write(oStream);{{else}}
+    oStream.Write({{.VarValue}}, sizeof({{.VarType}}));{{end}}{{end}}
+    return TRUE;
+__LEAVE_FUNCTION
+    return FALSE;
+}
+
+UINT {{.ClassName}}::Execute(Player* pPlayer)
+{
+__ENTER_FUNCTION   
+    return {{.ClassName}}Handler::Execute(this, pPlayer);
+__LEAVE_FUNCTION
+    return FALSE;
+}
