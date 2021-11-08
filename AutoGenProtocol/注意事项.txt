@@ -1,0 +1,45 @@
+AutoGenProtocol是一款用于生成天龙服务器端协议Protocol的自动化工具。
+
+使用方法：
+1.config.ini填写服务器和客户端所在的绝对路径
+2.在Protocol文件夹，按照CGTest、GCTest、GWTest、WGTest书写协议相关字段
+3.双击AutoGenProtocol.exe，协议会自动生成在Out目录，并复制到服务器和客户端的绝对路径
+4.关闭弹窗即可
+
+文件目录说明
+AutoGenProtocol
+Out:协议输出文件夹，用于自检。该协议在生成时会自动复制一份到服务器或客户端工程所在目录。不需要关注。
+Protocol:协议定义文件夹，所有的协议都在这里添加。需要重点关注。
+tmpl:模板文件夹。不需要关注。
+AutoGenProtocol.exe：可执行文件。双击即可将Protocol中定义的协议输出到服务器和客户端相应目录下。
+config.ini:第一行是服务器绝对路径配置文件。第二行是客户端绝对路径配置文件。首次使用修改即可。只需关注一次。
+注意事项：本文档。
+----------------------------------------------------------------------------------------------------------------------------------------------
+Version2.0
+优化底层数据结构，面向对象
+----------------------------------------------------------------------------------------------------------------------------------------------
+Version1.1
+支持客户端协议
+1.支持协议使用基本类型：ulong, long, uint, int, float, double, ushort, short, bool, string, byte, byte[];
+2.支持Unity的类型：Vector3, Vector2;
+3.支持自定义的类型：WorldPostion；
+4.支持以上类型的数组形式；
+6.支持生成lua或cs协议文件
+
+暂不支持客户端协议（未来会支持）
+1.不支持GC向lua协议号的添加。需要在PacketIdList.lua中增加相应的协议号及协议对应关系。
+2.不支持根据特殊类型生成using，如using UnityEngine;
+----------------------------------------------------------------------------------------------------------------------------------------------
+Version1.0
+支持
+1.支持协议使用基本类型：unsigned int, int, unsigned short, short, float, double, unsigned char, char, long long, unsigned long long;
+2.支持天龙重定义的基本类型：UINT, INT, USHORT, SHORT, FLOAT, DOUBLE, UCHAR, CHAR, BYTE, BOOL, WORD, INT64, UINT64;
+3.支持以ID_t结尾的类型；
+4.支持GUID64_t和WORLD_POS_3D两种自定义类型；
+5.支持以上类型的数组形式；
+6.支持GCHandler.cpp、GWHandler.cpp、WGHandler.cpp的增量更新；
+
+暂不支持（未来会支持）
+1.不支持协议号的添加。需要在PacketDefine.h中增加相应的协议号。
+2.不支持协议工厂的添加。需要在PacketFactoryManager.cpp中添加头文件引用和AddFactory。
+3.不支持添加新文件到项目。需要手动将新文件加入相应项目中。
