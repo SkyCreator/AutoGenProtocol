@@ -1,8 +1,10 @@
 class GCTest
-protocol PACKET_GC_TEST
-INT Value1
-UINT Value2[5]
-SHORT Value3
-BYTE Value4
-CHAR Value5[10]
-WORLD_POS_3D PosWorld
+protocol 2883|cs|lua
+int Score
+ulong Flag[5]
+short Count
+byte Value4[7]
+WorldPostion wpPos
+Vector3 Dir
+Vector2 Pos[6]
+string Title

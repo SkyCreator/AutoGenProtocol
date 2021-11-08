@@ -1,0 +1,20 @@
+using GameFramework.Network;
+
+namespace ProjectS
+{
+    public class {{.ClassName}}Handler : PacketHandlerBase
+    {
+        public override int Id
+        {
+            get
+            {
+                return {{.ProtocolName}};
+            }
+        }
+
+        public override void Handle(object sender, Packet packet)
+        {
+            base.Handle(sender, packet);
+        }
+    }
+}

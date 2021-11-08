@@ -1,8 +1,10 @@
 class CGTest
-protocol PACKET_CG_TEST
-INT Score
-UINT Flag[5]
-SHORT Count
-BYTE Value4
-CHAR Name[10]
-GUID64_t GuildID
+protocol 2882|cs|lua
+int Score
+ulong Flag[5]
+short Count
+string Name
+byte Value4[7]
+WorldPostion wpPos
+Vector3 Dir
+Vector2 Pos

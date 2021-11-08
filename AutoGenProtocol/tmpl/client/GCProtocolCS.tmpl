@@ -1,0 +1,82 @@
+namespace ProjectS
+{
+    public class {{.ClassName}} : PADownwardPacketBase
+    public override int Id
+    {
+        get
+        {
+            return {{.ProtocolName}};
+        }
+    }
+    {{range .DataVar}}{{if .VarIsArray}}
+    public {{.VarType}}[] m_{{.VarValue}} = new {{.VarType}}[{{.VarCount}}];{{else}}
+    public {{.VarType}} m_{{.VarValue}};{{end}}{{end}}
+    public override void Clear()
+    {
+        {{- range .DataVar}}
+        {{- if eq .VarType "string"}}
+        m_{{.VarValue}} = string.Empty;
+        {{- else if eq .VarType "WorldPostion"}}
+        m_{{.VarValue}}.Clear();
+        {{- else}}
+        m_{{.VarValue}} = default({{.VarType}});
+        {{- end}}
+        {{- end}}
+    }
+    public override int ReadStream(byte[] stream, int index, int size)
+     {
+        {{- range .DataVar}}
+        {{- if .VarIsArray }}
+        {{- if ne .VarType "byte"}}
+        for ( int i=0; i<m_{{.VarValue}}Count; ++i )
+        {
+        {{- end}}
+        {{- end}}
+        {{- if eq .VarType "ulong"}}
+        {{if .VarIsArray}}    {{end}}index = ReadUInt64(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "long"}}
+        {{if .VarIsArray}}    {{end}}index = ReadInt64(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "uint"}}
+        {{if .VarIsArray}}    {{end}}index = ReadUInt32(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "int"}}
+        {{if .VarIsArray}}    {{end}}index = ReadInt32(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "float"}}
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "double"}}
+        {{if .VarIsArray}}    {{end}}index = ReadDouble(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "ushort"}}
+        {{if .VarIsArray}}    {{end}}index = ReadUInt16(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "short"}}
+        {{if .VarIsArray}}    {{end}}index = ReadInt16(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "bool"}}
+        {{if .VarIsArray}}    {{end}}index = ReadBool(out m_{{.VarValue}}, stream, index, size);
+        {{- else if eq .VarType "string"}}
+        {{if .VarIsArray}}    {{end}}int len = PASocketStreamAssist.GetStringBytesLen(m_{{.VarValue}});
+        {{if .VarIsArray}}    {{end}}index = ReadByte(out (byte)len, stream, index, size);
+        {{if .VarIsArray}}    {{end}}index = ReadCharArray(out m_{{.VarValue}}.ToCharArray(), len, stream, index, size, true, true);
+        {{- else if eq .VarType "byte"}}
+        {{- if .VarIsArray}}
+        index = ReadBytes(out m_{{.VarValue}}, m_{{.VarValue}}Count, stream, index, size);
+        {{- else}}
+            index = ReadByte(out m_{{.VarValue}}, stream, index, size);
+        {{- end}}
+        {{- else if eq .VarType "WorldPostion"}}
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.x, stream, index, size);
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.z, stream, index, size);
+        {{- else if eq .VarType "Vector3"}}
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.x, stream, index, size);
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.y, stream, index, size);
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.z, stream, index, size);
+        {{- else if eq .VarType "Vector2"}}
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.x, stream, index, size);
+        {{if .VarIsArray}}    {{end}}index = ReadSingle(out m_{{.VarValue}}.y, stream, index, size);
+        {{- end}}
+        {{- if .VarIsArray}}
+        {{- if ne .VarType "byte"}}
+        }
+        {{- end}}
+        {{- end}}
+        {{- end}}
+        return index;
+    }
+}
