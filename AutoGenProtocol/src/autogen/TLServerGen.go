@@ -39,7 +39,9 @@ func (p *ProtocolGenTLServer) IsSpecialType(typeStr string) bool {
 	}
 	return false
 }
-
+func (p *ProtocolGenTLServer) IsSpecialExType(typeStr string) bool {
+	return false
+}
 func (p *ProtocolGenTLServer) GenProtocol(outPath string, pd *ProtocolData) {
 	//模板路径 todo：要放到配置文件中
 	phPath := "tmpl/server/ProtocolH.tmpl"

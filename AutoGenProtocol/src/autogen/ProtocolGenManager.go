@@ -13,6 +13,7 @@ import (
 type IProtocolGen interface {
 	IsBaseType(typeStr string) bool
 	IsSpecialType(typeStr string) bool
+	IsSpecialExType(typeStr string) bool
 	GenProtocol(outPath string, pd *ProtocolData)
 	Init(m *ProtocolGenManager)
 	GetWorkPath() (string, error)
@@ -39,7 +40,8 @@ type ProtocolData struct {
 	//0：生成客户端cs文件
 	//1：生成客户端lua文件
 	//2：同时生成客户端cs和lua文件
-	VarGenType int
+	VarGenType      int
+	IsNeedSpecialEx bool //true说明需要在文件中加入特殊引用，如using UnityEngine;
 }
 type DataLine struct {
 	flag  string
@@ -189,6 +191,9 @@ func (m *ProtocolGenManager) parseDataLine(protocoldata *ProtocolData, dl *DataL
 			protocoldata.DataVar = append(protocoldata.DataVar, ProtocolDataVar{VarType: dl.flag, VarValue: Filter_m_(dl.value), VarIsBaseType: true})
 		} else if (*pGen).IsSpecialType(dl.flag) {
 			protocoldata.DataVar = append(protocoldata.DataVar, ProtocolDataVar{VarType: dl.flag, VarValue: Filter_m_(dl.value), VarIsSpecialType: true})
+			if !protocoldata.IsNeedSpecialEx {
+				protocoldata.IsNeedSpecialEx = (*pGen).IsSpecialExType((dl.flag))
+			}
 		} else if IsString(dl.flag) {
 			protocoldata.DataVar = append(protocoldata.DataVar, ProtocolDataVar{VarType: "short", VarValue: Filter_m_(dl.value) + "Count", VarCount: "", VarIsNoSet: true})
 			protocoldata.DataVar = append(protocoldata.DataVar, ProtocolDataVar{VarType: dl.flag, VarValue: Filter_m_(dl.value)})

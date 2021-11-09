@@ -35,7 +35,13 @@ func (p *ProtocolGenPSClient) IsSpecialType(typeStr string) bool {
 	}
 	return false
 }
-
+func (p *ProtocolGenPSClient) IsSpecialExType(typeStr string) bool {
+	if strings.Compare(typeStr, "Vector3") == 0 ||
+		strings.Compare(typeStr, "Vector2") == 0 {
+		return true
+	}
+	return false
+}
 func (p *ProtocolGenPSClient) GenProtocol(outPath string, pd *ProtocolData) {
 	if !strings.ContainsRune(pd.ProtocolName, '|') {
 		return
