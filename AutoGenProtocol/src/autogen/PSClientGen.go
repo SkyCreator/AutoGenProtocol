@@ -3,6 +3,7 @@ package autogen
 import (
 	"AutoGenProtocol/src/libFile"
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -133,23 +134,32 @@ func (p *ProtocolGenPSClient) Append2ProtocolFile(pd *ProtocolData) {
 		return
 	}
 	tmpl := template.New("PacketIdList")
-	tmpl, err := tmpl.Parse("[{{.ProtocolName}}]		=	\"Packet/Response/{{.ClassName}}\",")
+	tmpl, err := tmpl.Parse("\n\t[{{.ProtocolName}}]		=	\"Packet/Response/{{.ClassName}}\",")
 	CheckErr(err)
 	workPath, _ := (*p).GetWorkPath()
 	handlerPath := workPath + "/Assets/GameMain/LuaScripts/Packet/PacketIdList.lua"
+	if CheckClassNameRepeat(handlerPath, pd.ClassName) {
+		return
+	}
+	buf := new(bytes.Buffer)
+	err = tmpl.Execute(buf, pd)
+	fileContext := libFile.GetFileContext(handlerPath)
+	index := strings.LastIndexByte(fileContext, '}')
+	libFile.FileInsertInfo(handlerPath, buf.String(), (int64)(index-1))
+	CheckErr(err)
+}
+
+func CheckClassNameRepeat(path string, classname string) bool {
 	var f *os.File
-	f, err = os.OpenFile(handlerPath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0755)
 	CheckErr(err)
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		content := scanner.Text()
-		if strings.Contains(content, pd.ClassName) {
-			return
+		if strings.Contains(content, classname) {
+			return true
 		}
 	}
-	fmt.Println(f.Seek(4, 2))
-	err = tmpl.Execute(f, pd)
-	CheckErr(err)
-	defer f.Close()
+	return false
 }

@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/fs"
 	"io/ioutil"
+	"libFile"
 	"os"
 	"strings"
 )
@@ -84,11 +85,19 @@ func FileInsertInfo(filename string, info string, offset int64) {
 	tempFile.WriteString(downContent)
 	file.Close()
 	tempFile.Close()
-	err = os.Rename(tmpname, filename)
+	str := strings.Split(filename, "/")
+	fname := str[len(str)-1]
+	err = os.Rename(tmpname, "./"+fname)
 	if err != nil {
 		fmt.Printf("Rename file raed failed! err: %v\n", err)
 		return
 	}
+	_, err = libFile.CopyFile(filename, "./"+fname)
+	//err := os.Rename("Out/"+fileName, finalPath+fileName)
+	if err != nil {
+		fmt.Printf("The system cannot find the path specified.The path is %s\n", filename)
+	}
+	fmt.Printf("FileInsertInfo %s\n", filename)
 }
 
 func CheckOrCreateDir(path string) error {
