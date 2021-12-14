@@ -33,6 +33,13 @@ func GetFileContextLines(filename string) ([]string, error) {
 	return lines, nil
 }
 
+//获得文本文件内容，以行为元素的切片
+func GetFileContextLinesNum(filename string) int {
+	lines, err := GetFileContextLines(filename)
+	CheckErr(err)
+	return len(lines)
+}
+
 //获取文件内容
 func GetFileContext(name string) string {
 	if contents, err := ioutil.ReadFile(name); err == nil {
@@ -118,4 +125,25 @@ func GetFilesFromDir(dir string) ([]fs.FileInfo, error) {
 		return nil, err
 	}
 	return files, nil
+}
+
+func AppendFileContent(path string, text string) {
+	var f *os.File
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
+	CheckErr(err)
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		content := scanner.Text()
+		if strings.Contains(content, text) {
+			return
+		}
+	}
+	f.WriteString(text)
+}
+
+func CheckErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

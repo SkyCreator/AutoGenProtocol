@@ -34,10 +34,7 @@ func (p *ProtocolGenTLServer) IsBaseType(typeStr string) bool {
 }
 
 func (p *ProtocolGenTLServer) IsSpecialType(typeStr string) bool {
-	if strings.Compare(typeStr, "GUID64_t") == 0 {
-		return true
-	}
-	return false
+	return strings.Compare(typeStr, "GUID64_t") == 0
 }
 func (p *ProtocolGenTLServer) IsSpecialExType(typeStr string) bool {
 	return false
@@ -52,7 +49,54 @@ func (p *ProtocolGenTLServer) GenProtocol(outPath string, pd *ProtocolData) {
 	if err == nil {
 		p.Manager.GenProtocolByTemplate(outPath+pd.ClassName+"Handler.cpp", tmplPath, pd)
 	}
-	p.append2ProtocolFile(pd)
+	p.Append2ProtocolFile(pd)
+	//p.AddReference(pd)
+}
+
+func (p *ProtocolGenTLServer) AddReference(pd *ProtocolData) {
+	workpath, _ := p.GetWorkPath()
+	protocolPath := workpath + "/Common/AutoGenProtocolDefine.h"
+	svcxprojPath := workpath + "/Server/Server/Server.vcxproj"         //项目工程文件
+	sfiltersPath := workpath + "/Server/Server/Server.vcxproj.filters" //工程的虚拟目录
+	wvcxprojPath := workpath + "/World/World/World.vcxproj"            //项目工程文件
+	wfiltersPath := workpath + "/World/World/World.vcxproj.filters"    //工程的虚拟目录
+	//sHandlerPath := workpath + "/Server/Server/Packets/"
+	//wHandlerPath := workpath + "/World/World/Packets/"
+	//hcppPath := workpath + "/Common/Packets/"
+	if !CheckNameRepeat(protocolPath, pd.ProtocolName) {
+		//插入到AutoGenProtocolDefine.h
+		n := GetFileContextLinesNum(protocolPath)
+		tmplText := fmt.Sprintf("{{.ProtocolName}} = %d,\n", 6000+n)
+		AppendFileWithTmpl(protocolPath, "AutoGenProtocolDefine", tmplText, "", pd)
+	}
+
+	fileName := pd.ClassName
+	switch fileName[0:2] {
+	case "CG":
+		fallthrough
+	case "GC":
+		fallthrough
+	case "WG":
+		{
+			//Handler.cpp
+			InsertFileWithTmpl(svcxprojPath, "pServerHandler", `\n    <ClCompile Include="Packets\{{.ClassName}}Handler.cpp" />`, `<ClCompile Include="Packets\`, pd)
+			InsertFileWithTmpl(sfiltersPath, "fServerHandler", `\n    <ClCompile Include="Packets\{{.ClassName}}Handler.cpp">\n\t  <Filter>Common\Packets\`+fileName[0:2]+`</Filter>\n\t</ClCompile>`, `<ClCompile Include="Packets\`, pd)
+			//.h,.cpp
+			InsertFileWithTmpl(svcxprojPath, "hpServer", `\n    <ClInclude Include="..\..\Common\Packets\{{.ClassName}}.h" />`, `<ClInclude Include="..\..\Common\Packets\`, pd)
+			InsertFileWithTmpl(sfiltersPath, "hfServer", `\n    <ClInclude Include="..\..\Common\Packets\{{.ClassName}}.h">\n\t  <Filter>Common\Packets\`+fileName[0:2]+`</Filter>\n\t</ClInclude>`, `<ClInclude Include="..\..\Common\Packets\`, pd)
+			InsertFileWithTmpl(svcxprojPath, "cpppServer", `\n    <ClCompile Include="..\..\Common\Packets\{{.ClassName}}.cpp" />`, `<ClCompile Include="Packets\`, pd)
+			InsertFileWithTmpl(sfiltersPath, "cppfServer", `\n    <ClCompile Include="..\..\Common\Packets\{{.ClassName}}.cpp">\n\t  <Filter>Common\Packets\`+fileName[0:2]+`</Filter>\n\t</ClCompile>`, `<ClCompile Include="Packets\`, pd)
+		}
+	case "GW":
+		//Handler.cpp
+		InsertFileWithTmpl(wvcxprojPath, "pWorldHandler", `\n    <ClCompile Include="Packets\{{.ClassName}}Handler.cpp" />`, `<ClCompile Include="Packets\`, pd)
+		InsertFileWithTmpl(wfiltersPath, "fWorldHandler", `\n    <ClCompile Include="Packets\{{.ClassName}}Handler.cpp">\n\t  <Filter>Packets</Filter>\n\t</ClCompile>`, `<ClCompile Include="Packets\`, pd)
+		//.h,.cpp
+		InsertFileWithTmpl(wvcxprojPath, "hpWorld", `\n    <ClInclude Include="..\..\Common\Packets\{{.ClassName}}.h" />`, `<ClInclude Include="..\..\Common\Packets\`, pd)
+		InsertFileWithTmpl(wfiltersPath, "hfWorld", `\n    <ClInclude Include="..\..\Common\Packets\{{.ClassName}}.h">\n\t  <Filter>Common\Packets</Filter>\n\t</ClInclude>`, `<ClInclude Include="..\..\Common\Packets\`, pd)
+		InsertFileWithTmpl(wvcxprojPath, "cpppWorld", `\n    <ClCompile Include="..\..\Common\Packets\{{.ClassName}}.cpp" />`, `<ClCompile Include="Packets\`, pd)
+		InsertFileWithTmpl(wfiltersPath, "cppfWorld", `\n    <ClCompile Include="..\..\Common\Packets\{{.ClassName}}.cpp">\n\t  <Filter>Common\Packets</Filter>\n\t</ClCompile>`, `<ClCompile Include="Packets\`, pd)
+	}
 }
 
 func GetProtocolHandlerTmplPath(protocolName string) (string, error) {
@@ -65,11 +109,11 @@ func GetProtocolHandlerTmplPath(protocolName string) (string, error) {
 	case "WG":
 		tmplPath = "tmpl/server/WGProtocolHandler.tmpl"
 	default:
-		return tmplPath, fmt.Errorf("GetProtocolHandlerTmplPath tmplPath is not exist!")
+		return tmplPath, fmt.Errorf("GetProtocolHandlerTmplPath tmplPath is not exist")
 	}
 	return tmplPath, nil
 }
-func (p *ProtocolGenTLServer) append2ProtocolFile(pd *ProtocolData) {
+func (p *ProtocolGenTLServer) Append2ProtocolFile(pd *ProtocolData) {
 	if strings.Contains(pd.ClassName, "Test") || strings.Contains(pd.ClassName, "TestHandler") {
 		return
 	}
@@ -96,7 +140,7 @@ func (p *ProtocolGenTLServer) append2ProtocolFile(pd *ProtocolData) {
 	}
 	err = tmpl.Execute(f, pd)
 	CheckErr(err)
-	defer f.Close()
+
 }
 func (p *ProtocolGenTLServer) GetWorkPath() (string, error) {
 	m := p.Manager
@@ -151,7 +195,7 @@ func (p *ProtocolGenTLServer) GetProtocolHandlerPath(protocolName string) (strin
 	case "WG":
 		tmplPath = workPath + "/World/World/Packets/WGHandler.cpp"
 	default:
-		return tmplPath, fmt.Errorf("GetProtocolHandlerPath tmplPath is not exist!")
+		return tmplPath, fmt.Errorf("GetProtocolHandlerPath tmplPath is not exist")
 	}
 	return tmplPath, nil
 }

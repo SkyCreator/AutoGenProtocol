@@ -2,6 +2,8 @@ package autogen
 
 import (
 	"AutoGenProtocol/src/libFile"
+	"bufio"
+	"bytes"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
@@ -242,4 +244,61 @@ func (m *ProtocolGenManager) GetProtocolData(filename string) *ProtocolData {
 		m.parseDataLine(&pd, &linelist[i])
 	}
 	return &pd
+}
+func CheckNameRepeat(path string, classname string) bool {
+	var f *os.File
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0755)
+	CheckErr(err)
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		content := scanner.Text()
+		if strings.Contains(content, classname) {
+			return true
+		}
+	}
+	return false
+}
+func GetFileContextLinesNum(filename string) int {
+	return libFile.GetFileContextLinesNum(filename)
+}
+func AppendFileWithTmpl(filepath string, tmplname string, tmplinfo string, flagtext string, pd *ProtocolData) {
+	buf := GetAnalysisTmplText(tmplname, tmplinfo, pd)
+	libFile.AppendFileContent(filepath, buf)
+}
+func InsertFileWithTmpl(filepath string, tmplname string, tmplinfo string, flagtext string, pd *ProtocolData) {
+	buf := GetAnalysisTmplText(tmplname, tmplinfo, pd)
+	fileContext := libFile.GetFileContext(filepath)
+	if len(fileContext) == 0 {
+		libFile.AppendFileContent(filepath, buf)
+		return
+	}
+	var upIndex int = strings.Index(fileContext, flagtext)
+	//var downIndex int = strings.LastIndex(fileContext, flagtext)
+	upoffset := len(fileContext[0:upIndex])
+	findContent := fileContext[upIndex:]
+	offset := FindFlagText(findContent, buf)
+	libFile.FileInsertInfo(filepath, buf, (int64)(upoffset+offset))
+}
+func GetAnalysisTmplText(tmplname string, tmplinfo string, pd *ProtocolData) string {
+	tmpl := template.New(tmplname)
+	tmpl, err := tmpl.Parse(tmplinfo)
+	CheckErr(err)
+	buf := new(bytes.Buffer)
+	err = tmpl.Execute(buf, pd)
+	CheckErr(err)
+	return buf.String()
+}
+func FindFlagText(findContent string, analysisTmplText string) int {
+	lines := strings.Split(findContent, "\n")
+	var findStr string = ""
+	for _, lineStr := range lines {
+		if lineStr != "" {
+			if strings.Trim(lineStr, "\t") < strings.Trim(analysisTmplText, "\t") {
+				findStr = lineStr
+				break
+			}
+		}
+	}
+	return strings.Index(findContent, findStr) + len(findStr)
 }

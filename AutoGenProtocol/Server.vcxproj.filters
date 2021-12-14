@@ -1,0 +1,26 @@
+<ItemGroup>		<ClCompile Include="..\..\Common\Pa\n  \n    <ClInclude Include="..\..\Common\Packets\WGTest.h">\n\t  <Filter>Common\Packets\WG</Filter>\n\t</ClInclude>  <ClCompi\n    <ClCompile Include="..\..\Common\Packets\WGTest.cpp">\n\t  <Filter>Common\Packets\WG</Filter>\n\t</ClCompile>le Include="Packets\WGTestHandler.cpp">\n\t  <Filter>Common\Packets\WG</Filter>\n\t</ClCompile>ckets\CGOTest.cpp">			<Filter>Common\Packets\CG</Filter>		</ClCompile>
+		<ClCompile Include="..\..\Common\Packets\CGZTest.cpp">
+			<Filter>Common\Packets\CG</Filter>
+		</ClCompile>
+		<ClCompile Include="Packets\CGATestHandler.cpp">
+			<Filter>Common\Packets\CG</Filter>
+		</ClCompile>
+		<ClCompile Include="Packets\CGOTestHandler.cpp">
+			<Filter>Common\Packets\CG</Filter>
+		</ClCompile>
+		<ClCompile Include="Packets\CGZTestHandler.cpp">
+			<Filter>Common\Packets\CG</Filter>
+		</ClCompile>
+  </ItemGroup>
+<ItemGroup>
+  <ClInclude Include="..\..\Common\Packets\CGATest.h">
+  	<Filter>Common\Packets\CG</Filter>
+  </ClInclude>
+  <ClInclude Include="..\..\Common\Packets\CGOTest.h">
+  	<Filter>Common\Packets\CG</Filter>
+  </ClInclude>
+  <ClInclude Include="..\..\Common\Packets\CGZTest.h">
+  	<Filter>Common\Packets\CG</Filter>
+  </ClInclude>
+</ItemGroup>
+</Project>

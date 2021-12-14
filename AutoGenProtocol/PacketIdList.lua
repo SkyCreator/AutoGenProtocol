@@ -1,4 +1,11 @@
--- 作者：黄伟-- 时间：2018/03/01-- 描述：消息包对应表-- ======================================PacketIdList = {	[1903]		=		"Packet/Response/GCSceneLineData",	[1062]		=		"Packet/Response/GCItemInfo",	[1902]		=		"Packet/Response/GCCheckChangeLineResult",
+﻿-- 作者：黄伟-- 时间：2018/03/01
+-- 描述：消息包对应表
+-- ======================================
+
+PacketIdList = {
+	[1903]		=		"Packet/Response/GCSceneLineData",
+	[1062]		=		"Packet/Response/GCItemInfo",
+	[1902]		=		"Packet/Response/GCCheckChangeLineResult",
 	[680]		=		"Packet/Response/GCNotifyChangeScene",
 	[553]		=		"Packet/Response/GCRetChangeScene",
 	[1419]		=		"Packet/Response/GCUseEquipResult",
@@ -118,6 +125,7 @@
 	[2417]      =		"Packet/Response/Skill/GCSkillXinfaRefixConfigInfo",
 	[2419]      =		"Packet/Response/Skill/GCSkillXinfaRefixResult",
 	[929]      =		"Packet/Response/Skill/GCCoolDownUpdate",
+	[2901]      =		"Packet/Response/Skill/GCCoolDownUpdateForValkyria",
 	[329]      =		"Packet/Response/Skill/GCDetailSkillList",
 	[947]       =       "Packet/Response/Pet/GCDetailAttrib_Pet",
 	[880]       =       "Packet/Response/Pet/GCManipulatePetRet",
@@ -303,7 +311,7 @@
 	[2876]      =   "Packet/Response/BattleManager/GCNotifyLookAt",
 	[2868]      =   "Packet/Response/BattleManager/GCNotifyTurnPrepare",
 	[2869]      =   "Packet/Response/BattleManager/GCNotifyTurnStart",
-	[2869]      =   "Packet/Response/BattleManager/GCNotifyTurnStart",
+	[2882]      =   "Packet/Response/BattleManager/GCCopySceneReconnectSucccess",
 	[2869]      =   "Packet/Response/BattleManager/GCNotifyTurnStart",
 	[2869]      =   "Packet/Response/BattleManager/GCNotifyTurnStart",
 	----------战斗管理器 结束-------

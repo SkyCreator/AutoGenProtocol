@@ -2,10 +2,25 @@
 
 BOOL {{.ClassName}}::Read( SocketInputStream& iStream )
 {
-__ENTER_FUNCTION{{range .DataVar}}{{if .VarIsArray}}
-    iStream.GetArray({{.VarValue}}, {{.VarValue}}Count);{{else if .VarIsSpecialType}}
-    {{.VarValue}}.Read(iStream);{{else}}
-    iStream.Read({{.VarValue}}, sizeof({{.VarType}}));{{end}}{{end}}
+__ENTER_FUNCTION
+    {{- range .DataVar}}
+    {{- if .VarIsArray}}
+    {{- if .VarIsSpecialType}}
+    {{.VarValue}}[i].Read(iStream);
+    {{- else}}
+    for ( INT i=0; i<{{.VarCount}}; ++i )
+    {
+        iStream.Read({{.VarValue}}[i], sizeof({{.VarType}}));
+    }
+    {{- end}}
+    {{- else}}
+    {{- if .VarIsSpecialType}}
+    {{- .VarValue}}.Read(iStream);
+    {{- else}}
+    iStream.Read({{.VarValue}}, sizeof({{.VarType}}));
+    {{- end}}
+    {{- end}}
+    {{- end}}
     return TRUE;
 __LEAVE_FUNCTION
     return FALSE;
@@ -13,10 +28,25 @@ __LEAVE_FUNCTION
 
 BOOL {{.ClassName}}::Write( SocketOutputStream& oStream ) const
 {
-__ENTER_FUNCTION{{range .DataVar}}{{if .VarIsArray}}
-    oStream.PutArray({{.VarValue}}, {{.VarValue}}Count);{{else if .VarIsSpecialType}}
-    {{.VarValue}}.Write(oStream);{{else}}
-    oStream.Write({{.VarValue}}, sizeof({{.VarType}}));{{end}}{{end}}
+__ENTER_FUNCTION
+    {{- range .DataVar}}
+    {{- if .VarIsArray}}
+    {{- if .VarIsSpecialType}}
+    {{.VarValue}}[i].Write(oStream);
+    {{- else}}
+    for ( INT i=0; i<{{.VarCount}}; ++i )
+    {
+        oStream.Write({{.VarValue}}[i], sizeof({{.VarType}}));
+    }
+    {{- end}}
+    {{- else}}
+    {{- if .VarIsSpecialType}}
+    {{- .VarValue}}.Write(oStream);
+    {{- else}}
+    oStream.Write({{.VarValue}}, sizeof({{.VarType}}));
+    {{- end}}
+    {{- end}}
+    {{- end}}
     return TRUE;
 __LEAVE_FUNCTION
     return FALSE;
